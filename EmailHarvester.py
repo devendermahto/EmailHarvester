@@ -75,7 +75,7 @@ class myparser:
     def emails(self):
         self.genericClean()
         reg_emails = re.compile(
-            '[a-zA-Z0-9.\-_+#~!$&\',;=:]+' +
+            r'[a-zA-Z0-9.\-_+#~!$&\',;=:]+' +
             '@' +
             '[a-zA-Z0-9.-]*' +
             self.word)
@@ -141,7 +141,7 @@ class EmailHarvester(object):
             sys.exit(4)
 
         if r.encoding is None:
-	          r.encoding = 'UTF-8'
+              r.encoding = 'UTF-8'
 
         self.results = r.content.decode(r.encoding)
         self.totalresults += self.results
@@ -198,8 +198,7 @@ def checkDomain(value):
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description="""
-
+    parser = argparse.ArgumentParser(description=r"""\ 
  _____                   _  _   _   _                                _              
 |  ___|                 (_)| | | | | |                              | |             
 | |__  _ __ ___    __ _  _ | | | |_| |  __ _  _ __ __   __ ___  ___ | |_  ___  _ __ 
@@ -233,7 +232,7 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--list-plugins', action='store_true', dest='listplugins', 
                         default=False, help='List all available plugins.')
     
-    if len(sys.argv) is 1:
+    if len(sys.argv) == 1:
         parser.print_help()
         sys.exit()
 
@@ -255,7 +254,7 @@ if __name__ == '__main__':
     domain = args.domain
 
     userAgent = (args.uagent or
-                 "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1")
+                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36")
     
     print(green("[+] User-Agent in use: ") + cyan(userAgent))
     
@@ -283,7 +282,42 @@ if __name__ == '__main__':
     else:
         all_emails = plugins[engine]['search'](domain, limit)
     all_emails = unique(all_emails)
-    
+    try:
+        all_emails.remove('2522@'+str(domain))
+    except:
+        pass
+    try:
+        all_emails.remove('20@'+str(domain))
+    except:
+        pass
+    try:
+        all_emails.remove('22@'+str(domain))
+    except:
+        pass
+    try:
+        all_emails.remove('x22@'+str(domain))
+    except:
+        pass
+    try:
+        all_emails.remove('plusones+@'+str(domain))
+    except:
+        pass
+    try:
+        all_emails.remove('2B@'+str(domain))
+    except:
+        pass
+    try:
+        all_emails.remove('instagram.com+@'+str(domain))
+    except:
+        pass
+    try:
+        if "'@"+str(domain) in all_emails:
+            all_emails.remove("'@"+str(domain))
+        all_emails=[email for email in all_emails if '@' in email and email.split('@')[0]]#Remove emails that doesn't have username eg: @domain.com`
+        all_emails =[email for email in all_emails if email.endswith('@' + domain)]#Remove Emails that doesn't belong to user input domain
+    except Exception as v:
+        print(v)
+        pass
     if not all_emails:
         print(red("[-] No emails found"))
         sys.exit(4)
