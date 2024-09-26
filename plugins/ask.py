@@ -55,17 +55,19 @@ class AskSearch(object):
         try:
             urly = self.url.format(page=str(self.page), word=self.word)
             headers = {'User-Agent': self.userAgent}
-            if(self.proxy):
+            if self.proxy:
                 proxies = {self.proxy.scheme: "http://" + self.proxy.netloc}
-                r=requests.get(urly, headers=headers, proxies=proxies)
+                r = requests.get(urly, headers=headers, proxies=proxies)
             else:
-                r=requests.get(urly, headers=headers)
-                
+                r = requests.get(urly, headers=headers)
+            
         except Exception as e:
             print(e)
             sys.exit(4)
-        
-        self.results = r.content.decode(r.encoding)
+
+        # Check if r.encoding is None and default to 'utf-8'
+        encoding = r.encoding if r.encoding else 'utf-8'
+        self.results = r.content.decode(encoding)
         self.totalresults += self.results
     
     def process(self):
